@@ -8,6 +8,7 @@ Available on PowerShell Gallery:
 
 ## Table of contents
 * [Getting started](#getting-started)
+* [Web Admin UI](#web-admin-ui)
 * [Getting help](#getting-help)
 * [Contributing](#contributing)
 * [Dependencies](#dependencies)
@@ -39,6 +40,42 @@ Update-Module -name d365fo.tools
 ```PowerShell
 Update-Module -name d365fo.tools -Force
 ```
+
+## Web Admin UI
+
+Prefer a graphical interface over PowerShell? We've created a modern web UI for the most common D365FO admin tasks.
+
+### Quick Start
+
+Navigate to the `web-app` directory and run:
+
+```powershell
+cd web-app
+npm install
+npm start
+```
+
+Then open your browser to: **http://localhost:3000**
+
+### Features
+
+The web UI provides easy access to:
+- **Environment Health Check** - Monitor D365 services (AOS, Batch, Financial Reporter, DMF)
+- **Service Management** - Restart services with one click
+- **Database Backup** - Create BACPAC files for disaster recovery
+- **Database Restore** - Import BACPAC files to refresh environments
+- **Database Sync** - Synchronize database after deployments
+
+### Documentation
+
+See [web-app/README.md](web-app/README.md) for:
+- Complete setup instructions
+- Detailed command documentation
+- Troubleshooting guide
+- Architecture overview
+
+For a quick start guide, see [web-app/QUICKSTART.md](web-app/QUICKSTART.md).
+
 ## Getting help
 
 [The wiki](https://github.com/d365collaborative/d365fo.tools/wiki) contains more details about installation and also guides to help you with some common tasks. It also contains documentation for all the module's commands. Expand the wiki's `Pages` control at the top of the content sidebar to view and search the list of command documentation pages.
