@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>D365 Finance & Operations Admin Tools</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>D365 Finance & Operations Admin Tools</h1>
+            <p class="subtitle">Web UI for common management tasks</p>
+        </header>
+
+        <nav class="command-nav">
+            <button class="nav-btn active" data-command="Get-D365Environment">
+                <span class="icon">📊</span>
+                Environment Health
+            </button>
+            <button class="nav-btn" data-command="Restart-D365Environment">
+                <span class="icon">🔄</span>
+                Restart Services
+            </button>
+            <button class="nav-btn" data-command="New-D365Bacpac">
+                <span class="icon">💾</span>
+                Backup Database
+            </button>
+            <button class="nav-btn" data-command="Import-D365Bacpac">
+                <span class="icon">📥</span>
+                Restore Database
+            </button>
+            <button class="nav-btn" data-command="Invoke-D365DBSync">
+                <span class="icon">🔗</span>
+                Sync Database
+            </button>
+        </nav>
+
+        <main>
+            <!-- Get-D365Environment Command -->
+            <div class="command-form" id="form-Get-D365Environment">
+                <h2>Check Environment Health</h2>
+                <p class="description">Check the status of D365 services (AOS, Batch, Financial Reporter, DMF)</p>
+
+                <form onsubmit="executeCommand(event, 'Get-D365Environment')">
+                    <div class="form-group">
+                        <label for="env-ComputerName">Computer Name (optional)</label>
+                        <input type="text" id="env-ComputerName" name="ComputerName" placeholder="Leave empty for local machine">
+                        <small>The name of the computer to query</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="env-ShowDetails">Show Detailed Info</label>
+                        <input type="checkbox" id="env-ShowDetails" name="Detailed">
+                        <small>Display additional information about each service</small>
+                    </div>
+
+                    <button type="submit" class="btn-primary">Check Environment Status</button>
+                </form>
+            </div>
+
+            <!-- Restart-D365Environment Command -->
+            <div class="command-form hidden" id="form-Restart-D365Environment">
+                <h2>Restart Services</h2>
+                <p class="description">Restart D365 services. Useful for clearing caches or after deployments</p>
+
+                <form onsubmit="executeCommand(event, 'Restart-D365Environment')">
+                    <div class="form-group">
+                        <label for="restart-ComputerName">Computer Name (optional)</label>
+                        <input type="text" id="restart-ComputerName" name="ComputerName" placeholder="Leave empty for local machine">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="restart-ServiceType">Service to Restart</label>
+                        <select id="restart-ServiceType" name="ServiceType">
+                            <option value="">All Services</option>
+                            <option value="AOS">AOS (Application Object Server)</option>
+                            <option value="Batch">Batch Server</option>
+                            <option value="MR">Management Reporter</option>
+                            <option value="DMF">Data Management Framework</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="restart-Wait">Wait for Restart to Complete</label>
+                        <input type="checkbox" id="restart-Wait" name="Wait" checked>
+                        <small>Wait until all services are running again</small>
+                    </div>
+
+                    <button type="submit" class="btn-primary">Restart Services</button>
+                </form>
+            </div>
+
+            <!-- New-D365Bacpac Command -->
+            <div class="command-form hidden" id="form-New-D365Bacpac">
+                <h2>Backup Database (Create BACPAC)</h2>
+                <p class="description">Create a backup of the D365 database to a BACPAC file</p>
+
+                <form onsubmit="executeCommand(event, 'New-D365Bacpac')">
+                    <div class="form-group">
+                        <label for="backup-OutputPath">Output Directory *</label>
+                        <input type="text" id="backup-OutputPath" name="OutputPath" required placeholder="e.g., C:\\Backups">
+                        <small>Where to save the BACPAC file</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="backup-SourceComputerName">Source Computer (optional)</label>
+                        <input type="text" id="backup-SourceComputerName" name="SourceComputerName" placeholder="Leave empty for local machine">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="backup-DatabaseName">Database Name (optional)</label>
+                        <input type="text" id="backup-DatabaseName" name="DatabaseName" placeholder="Defaults to AxDB">
+                        <small>Usually AxDB or AxDB_suffix</small>
+                    </div>
+
+                    <button type="submit" class="btn-primary">Create Backup</button>
+                </form>
+            </div>
+
+            <!-- Import-D365Bacpac Command -->
+            <div class="command-form hidden" id="form-Import-D365Bacpac">
+                <h2>Restore Database (Import BACPAC)</h2>
+                <p class="description">Restore a database from a BACPAC file</p>
+
+                <form onsubmit="executeCommand(event, 'Import-D365Bacpac')">
+                    <div class="form-group">
+                        <label for="restore-BacpacFile">BACPAC File Path *</label>
+                        <input type="text" id="restore-BacpacFile" name="BacpacFile" required placeholder="e.g., C:\\Backups\\backup.bacpac">
+                        <small>Full path to the BACPAC file</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="restore-TargetComputerName">Target Computer (optional)</label>
+                        <input type="text" id="restore-TargetComputerName" name="TargetComputerName" placeholder="Leave empty for local machine">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="restore-NewDatabaseName">New Database Name (optional)</label>
+                        <input type="text" id="restore-NewDatabaseName" name="NewDatabaseName" placeholder="Defaults to AxDB">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="restore-DiagnosticFile">Enable Diagnostics</label>
+                        <input type="checkbox" id="restore-DiagnosticFile" name="DiagnosticFile">
+                        <small>Save diagnostic output (helpful for troubleshooting)</small>
+                    </div>
+
+                    <button type="submit" class="btn-primary">Import BACPAC</button>
+                </form>
+            </div>
+
+            <!-- Invoke-D365DBSync Command -->
+            <div class="command-form hidden" id="form-Invoke-D365DBSync">
+                <h2>Sync Database</h2>
+                <p class="description">Synchronize database with the data model (run after BACPAC import or code deployment)</p>
+
+                <form onsubmit="executeCommand(event, 'Invoke-D365DBSync')">
+                    <div class="form-group">
+                        <label for="sync-Timeout">Timeout (seconds) (optional)</label>
+                        <input type="number" id="sync-Timeout" name="Timeout" placeholder="600" min="60">
+                        <small>Maximum time to wait for sync to complete</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="sync-ShowProgress">Show Progress</label>
+                        <input type="checkbox" id="sync-ShowProgress" name="ShowProgress" checked>
+                        <small>Display real-time progress updates</small>
+                    </div>
+
+                    <button type="submit" class="btn-primary">Start Sync</button>
+                </form>
+            </div>
+        </main>
+
+        <!-- Output Section -->
+        <section class="output-section">
+            <h3>Output</h3>
+            <div class="output-header">
+                <span id="command-name">Ready</span>
+                <span id="execution-time"></span>
+                <button class="btn-small" id="copy-btn" onclick="copyOutput()" style="display:none;">Copy</button>
+                <button class="btn-small" id="clear-btn" onclick="clearOutput()">Clear</button>
+            </div>
+            <pre id="output" class="output-box">Waiting for command execution...</pre>
+        </section>
+    </div>
+
+    <script src="/app.js"></script>
+</body>
+</html>
