@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//c/Users/Ting.Xu/OneDrive - INOTIV, INC/Desktop/FO Tools/**)",
+      "Bash(robocopy \"d365fo-web-app\" \"d365fo.tools\\\\web-app\" /S /E /XD .git)",
+      "Bash(dir \"d365fo.tools\\\\web-app\")",
+      "Bash(git add *)",
+      "Bash(git commit -m 'feat: add web UI for D365FO admin tools *)",
+      "Bash(git commit *)"
+    ],
+    "additionalDirectories": [
+      "c:\\Users\\Ting.Xu\\OneDrive - INOTIV, INC\\Desktop\\FO Tools\\d365fo-web-app"
+    ]
+  }
+}
