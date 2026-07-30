@@ -1,3 +1,38 @@
+/*
+ * Styled after Dynamics 365 Finance & Operations (Fluent / Office UI Fabric):
+ * Segoe UI throughout, a dark command bar, a flat navigation pane, square
+ * corners, neutral greys for chrome and a single blue accent for action.
+ */
+
+:root {
+    /* Fluent theme ramp */
+    --theme-primary: #0078d4;
+    --theme-dark-alt: #106ebe;
+    --theme-dark: #005a9e;
+    --theme-light: #deecf9;
+    --theme-lighter: #eff6fc;
+
+    /* Fluent neutral ramp */
+    --neutral-lighter-alt: #faf9f8;
+    --neutral-lighter: #f3f2f1;
+    --neutral-light: #edebe9;
+    --neutral-quaternary: #d2d0ce;
+    --neutral-tertiary: #a19f9d;
+    --neutral-secondary: #605e5c;
+    --neutral-primary: #323130;
+
+    /* F&O command bar */
+    --command-bar: #0b3c5d;
+    --command-bar-text: #ffffff;
+
+    --error: #a4262c;
+    --error-bg: #fde7e9;
+    --success: #107c10;
+    --success-bg: #dff6dd;
+    --warning-bg: #fff4ce;
+    --warning-border: #f2c811;
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -5,79 +40,318 @@
 }
 
 body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    font-family: 'Segoe UI', 'Segoe UI Web (West European)', -apple-system,
+        BlinkMacSystemFont, Roboto, 'Helvetica Neue', sans-serif;
+    font-size: 14px;
+    background: var(--neutral-lighter);
+    color: var(--neutral-primary);
     min-height: 100vh;
-    padding: 20px;
 }
 
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
+/* ---------- command bar ------------------------------------------------- */
+
+.topbar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    height: 48px;
+    padding: 0 12px;
+    background: var(--command-bar);
+    color: var(--command-bar-text);
 }
 
-header {
-    text-align: center;
-    color: white;
-    margin-bottom: 40px;
-    padding: 30px 0;
+.topbar-nav-btn {
+    font-family: 'Segoe MDL2 Assets';
+    font-size: 16px;
+    width: 36px;
+    height: 36px;
+    border: none;
+    background: transparent;
+    color: var(--command-bar-text);
+    cursor: pointer;
 }
 
-header h1 {
-    font-size: 2.5em;
-    margin-bottom: 10px;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+.topbar-nav-btn:hover {
+    background: rgba(255, 255, 255, 0.12);
 }
 
-header .subtitle {
-    font-size: 1.1em;
+.topbar-app {
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.topbar-divider {
+    width: 1px;
+    height: 20px;
+    background: rgba(255, 255, 255, 0.35);
+}
+
+.topbar-module {
+    font-size: 14px;
     opacity: 0.9;
 }
 
-.command-nav {
+.topbar-spacer {
+    flex: 1;
+}
+
+.topbar-env {
+    font-size: 12px;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    opacity: 0.85;
+    padding-right: 8px;
+}
+
+/* ---------- page ------------------------------------------------------- */
+
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 16px;
+}
+
+/* ---------- message bar ------------------------------------------------ */
+
+.message-bar {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 14px;
+    margin-bottom: 16px;
+    font-size: 13px;
+    line-height: 1.45;
+}
+
+.message-bar-warning {
+    background: var(--warning-bg);
+    border-left: 4px solid var(--warning-border);
+}
+
+.message-bar-icon {
+    font-family: 'Segoe MDL2 Assets';
+    font-size: 15px;
+    line-height: 1.3;
+    flex-shrink: 0;
+}
+
+.message-bar code {
+    font-family: Consolas, 'Courier New', monospace;
+    background: rgba(0, 0, 0, 0.07);
+    padding: 1px 5px;
+}
+
+.message-bar.hidden {
+    display: none;
+}
+
+/* ---------- layout ----------------------------------------------------- */
+
+.layout {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 15px;
-    margin-bottom: 30px;
+    grid-template-columns: 240px minmax(0, 1fr);
+    gap: 16px;
+    align-items: start;
+}
+
+/* ---------- navigation pane -------------------------------------------- */
+
+.command-nav {
+    display: flex;
+    flex-direction: column;
+    background: #ffffff;
+    border: 1px solid var(--neutral-light);
+    position: sticky;
+    top: 16px;
+}
+
+.nav-header {
+    padding: 12px 16px 8px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--neutral-secondary);
 }
 
 .nav-btn {
-    padding: 15px;
-    background: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 1em;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
-    gap: 8px;
+    justify-content: flex-start;
+    gap: 12px;
+    width: 100%;
+    padding: 10px 16px;
+    background: transparent;
+    border: none;
+    border-left: 3px solid transparent;
+    font-family: inherit;
+    font-size: 14px;
+    color: var(--neutral-primary);
+    text-align: left;
+    cursor: pointer;
 }
 
 .nav-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    background: var(--neutral-lighter);
 }
 
 .nav-btn.active {
-    background: #667eea;
-    color: white;
+    background: var(--neutral-light);
+    border-left-color: var(--theme-primary);
     font-weight: 600;
 }
 
 .nav-btn .icon {
-    font-size: 1.8em;
+    font-family: 'Segoe MDL2 Assets';
+    font-size: 16px;
+    line-height: 1;
+    width: 16px;
+    flex-shrink: 0;
+    color: var(--theme-primary);
 }
 
+/* ---------- command catalog -------------------------------------------- */
+
+.nav-header-spaced {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-top: 8px;
+    border-top: 1px solid var(--neutral-light);
+    padding-top: 12px;
+}
+
+.nav-count {
+    font-weight: 400;
+    color: var(--neutral-tertiary);
+}
+
+.nav-search {
+    position: relative;
+    padding: 0 12px 10px;
+}
+
+.nav-search-icon {
+    position: absolute;
+    left: 20px;
+    top: 7px;
+    font-family: 'Segoe MDL2 Assets';
+    font-size: 12px;
+    color: var(--neutral-secondary);
+    pointer-events: none;
+}
+
+.nav-search input {
+    width: 100%;
+    height: 28px;
+    padding: 4px 6px 4px 26px;
+    border: 1px solid var(--neutral-secondary);
+    border-radius: 0;
+    font-family: inherit;
+    font-size: 13px;
+}
+
+.nav-search input:focus {
+    outline: none;
+    border: 2px solid var(--theme-primary);
+    padding: 3px 5px 3px 25px;
+}
+
+.catalog-list {
+    max-height: 420px;
+    overflow-y: auto;
+    border-top: 1px solid var(--neutral-light);
+}
+
+.catalog-status {
+    padding: 12px 16px;
+    font-size: 12px;
+    color: var(--neutral-tertiary);
+}
+
+.catalog-error {
+    color: var(--error);
+}
+
+.catalog-group > summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 7px 16px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--neutral-secondary);
+    cursor: pointer;
+    list-style: none;
+    user-select: none;
+}
+
+.catalog-group > summary::-webkit-details-marker {
+    display: none;
+}
+
+.catalog-group > summary::before {
+    content: '\E70D';
+    font-family: 'Segoe MDL2 Assets';
+    font-size: 9px;
+    margin-right: 8px;
+    transform: rotate(-90deg);
+    transition: transform 0.12s;
+}
+
+.catalog-group[open] > summary::before {
+    transform: rotate(0deg);
+}
+
+.catalog-group > summary:hover {
+    background: var(--neutral-lighter);
+}
+
+.catalog-group-name {
+    flex: 1;
+}
+
+.catalog-group-count {
+    color: var(--neutral-tertiary);
+    font-weight: 400;
+}
+
+.catalog-item {
+    display: block;
+    width: 100%;
+    padding: 5px 16px 5px 34px;
+    border: none;
+    border-left: 3px solid transparent;
+    background: transparent;
+    font-family: inherit;
+    font-size: 12.5px;
+    color: var(--neutral-primary);
+    text-align: left;
+    cursor: pointer;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.catalog-item:hover {
+    background: var(--neutral-lighter);
+}
+
+.catalog-item.selected {
+    background: var(--neutral-light);
+    border-left-color: var(--theme-primary);
+    font-weight: 600;
+}
+
+/* ---------- content surface -------------------------------------------- */
+
 main {
-    background: white;
-    border-radius: 12px;
-    padding: 40px;
-    margin-bottom: 30px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-    min-height: 300px;
+    background: #ffffff;
+    border: 1px solid var(--neutral-light);
+    padding: 20px 24px 24px;
+    margin-bottom: 16px;
+    min-height: 280px;
 }
 
 .command-form {
@@ -89,168 +363,354 @@ main {
 }
 
 .command-form h2 {
-    color: #333;
-    margin-bottom: 10px;
-    font-size: 1.8em;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--neutral-primary);
+    margin-bottom: 4px;
 }
 
 .description {
-    color: #666;
-    margin-bottom: 25px;
-    font-size: 0.95em;
+    color: var(--neutral-secondary);
+    font-size: 13px;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--neutral-light);
 }
 
+/* ---------- fields ------------------------------------------------------ */
+
 .form-group {
-    margin-bottom: 20px;
+    margin-bottom: 16px;
+    max-width: 620px;
 }
 
 .form-group label {
     display: block;
-    margin-bottom: 8px;
+    margin-bottom: 4px;
+    font-size: 13px;
     font-weight: 600;
-    color: #333;
+    color: var(--neutral-primary);
 }
 
 .form-group input[type="text"],
+.form-group input[type="password"],
 .form-group input[type="number"],
 .form-group select {
     width: 100%;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    font-size: 0.95em;
-    transition: border-color 0.2s;
+    padding: 6px 8px;
+    height: 32px;
+    border: 1px solid var(--neutral-secondary);
+    border-radius: 0;
+    background: #ffffff;
+    font-family: inherit;
+    font-size: 14px;
+    color: var(--neutral-primary);
+}
+
+.form-group input[type="text"]:hover,
+.form-group input[type="password"]:hover,
+.form-group input[type="number"]:hover,
+.form-group select:hover {
+    border-color: var(--neutral-primary);
 }
 
 .form-group input[type="text"]:focus,
+.form-group input[type="password"]:focus,
 .form-group input[type="number"]:focus,
 .form-group select:focus {
     outline: none;
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    /* F&O thickens the border on focus rather than using a glow. */
+    border: 2px solid var(--theme-primary);
+    padding: 5px 7px;
+}
+
+.form-group input::placeholder {
+    color: var(--neutral-tertiary);
 }
 
 .form-group input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
     margin-right: 8px;
+    accent-color: var(--theme-primary);
     cursor: pointer;
-    width: 18px;
-    height: 18px;
+    vertical-align: -2px;
 }
 
-.form-group input[type="checkbox"] + label {
-    display: inline;
+/*
+ * F&O puts a checkbox before its caption on a single line. The markup here has
+ * the label first (correct for accessibility, since `for` pairs them), so the
+ * order is corrected visually instead of restructuring all ten fields.
+ * `> input` keeps this off .service-checkboxes, whose boxes are inside labels.
+ */
+.form-group:has(> input[type="checkbox"]) {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.form-group:has(> input[type="checkbox"]) > input[type="checkbox"] {
+    order: 1;
+}
+
+.form-group:has(> input[type="checkbox"]) > label {
+    order: 2;
     margin-bottom: 0;
+    font-weight: normal;
+}
+
+.form-group:has(> input[type="checkbox"]) > small {
+    order: 3;
+    flex-basis: 100%;
+    margin-top: 3px;
+    margin-left: 24px;
 }
 
 .form-group small {
     display: block;
-    color: #999;
-    margin-top: 5px;
-    font-size: 0.85em;
+    margin-top: 4px;
+    font-size: 12px;
+    color: var(--neutral-secondary);
 }
 
+.service-checkboxes {
+    padding: 12px 14px;
+    background: var(--neutral-lighter-alt);
+    border: 1px solid var(--neutral-light);
+}
+
+.service-checkboxes label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: normal;
+    font-size: 14px;
+}
+
+.service-checkboxes label:last-child {
+    margin-bottom: 0;
+}
+
+/* ---------- buttons ----------------------------------------------------- */
+
 .btn-primary {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    padding: 12px 32px;
-    border: none;
-    border-radius: 6px;
-    font-size: 1em;
+    min-width: 140px;
+    height: 32px;
+    padding: 0 20px;
+    margin-top: 4px;
+    background: var(--theme-primary);
+    color: #ffffff;
+    border: 1px solid var(--theme-primary);
+    border-radius: 0;
+    font-family: inherit;
+    font-size: 14px;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.3s ease;
-    width: 100%;
 }
 
 .btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 12px rgba(102, 126, 234, 0.4);
+    background: var(--theme-dark-alt);
+    border-color: var(--theme-dark-alt);
 }
 
 .btn-primary:active {
-    transform: translateY(0);
+    background: var(--theme-dark);
+    border-color: var(--theme-dark);
 }
 
 .btn-primary:disabled {
-    opacity: 0.6;
+    background: var(--neutral-light);
+    border-color: var(--neutral-light);
+    color: var(--neutral-tertiary);
     cursor: not-allowed;
-    transform: none;
 }
 
 .btn-small {
-    background: #667eea;
-    color: white;
-    padding: 6px 12px;
-    border: none;
-    border-radius: 4px;
-    font-size: 0.85em;
+    height: 26px;
+    padding: 0 12px;
+    margin-left: 8px;
+    background: #ffffff;
+    color: var(--neutral-primary);
+    border: 1px solid var(--neutral-quaternary);
+    border-radius: 0;
+    font-family: inherit;
+    font-size: 12px;
     cursor: pointer;
-    transition: background 0.2s;
-    margin-left: 10px;
 }
 
 .btn-small:hover {
-    background: #764ba2;
+    background: var(--neutral-lighter);
+    border-color: var(--neutral-secondary);
 }
 
-.output-section {
-    background: white;
-    border-radius: 12px;
-    padding: 30px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+/* ---------- FastTab ----------------------------------------------------- */
+
+.fasttab {
+    background: #ffffff;
+    border: 1px solid var(--neutral-light);
 }
 
-.output-section h3 {
-    color: #333;
-    margin-bottom: 15px;
-    font-size: 1.3em;
-}
-
-.output-header {
+.fasttab-header {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    margin-bottom: 15px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid #eee;
+    gap: 10px;
+    padding: 10px 16px;
+    background: var(--neutral-lighter-alt);
+    border-bottom: 1px solid var(--neutral-light);
+}
+
+.fasttab-chevron {
+    font-family: 'Segoe MDL2 Assets';
+    font-size: 11px;
+    color: var(--neutral-secondary);
+}
+
+.fasttab-title {
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.fasttab-summary {
+    flex: 1;
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    font-size: 12px;
+    color: var(--neutral-secondary);
+    padding-left: 12px;
+    border-left: 1px solid var(--neutral-quaternary);
+    margin-left: 4px;
+}
+
+.fasttab-actions {
+    flex-shrink: 0;
+}
+
+.fasttab-body {
+    padding: 16px;
 }
 
 #command-name {
     font-weight: 600;
-    color: #667eea;
+    color: var(--theme-dark);
 }
 
 #execution-time {
-    color: #999;
-    font-size: 0.9em;
+    color: var(--neutral-secondary);
 }
 
+/* ---------- output ------------------------------------------------------ */
+
 .output-box {
-    background: #f5f5f5;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    padding: 15px;
+    background: var(--neutral-lighter-alt);
+    border: 1px solid var(--neutral-light);
+    border-left: 3px solid var(--neutral-quaternary);
+    padding: 12px 14px;
     min-height: 150px;
-    max-height: 400px;
-    overflow-y: auto;
-    font-family: 'Monaco', 'Courier New', monospace;
-    font-size: 0.85em;
-    line-height: 1.5;
-    color: #333;
+    max-height: 420px;
+    overflow: auto;
+    font-family: Consolas, 'Courier New', monospace;
+    font-size: 12.5px;
+    line-height: 1.55;
+    color: var(--neutral-primary);
+    white-space: pre;
+}
+
+.output-box.success {
+    background: var(--success-bg);
+    border-left-color: var(--success);
+}
+
+.output-box.error {
+    background: var(--error-bg);
+    border-left-color: var(--error);
+    color: var(--error);
     white-space: pre-wrap;
     word-wrap: break-word;
 }
 
-.output-box.success {
-    background: #f0f9ff;
-    border-color: #4ade80;
+/* ---------- recent runs (grid-like) ------------------------------------- */
+
+.history {
+    margin-top: 20px;
 }
 
-.output-box.error {
-    background: #fef2f2;
-    border-color: #ef4444;
-    color: #dc2626;
+.history h4 {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--neutral-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding-bottom: 6px;
+    margin-bottom: 2px;
+    border-bottom: 1px solid var(--neutral-quaternary);
 }
+
+.history ul {
+    list-style: none;
+}
+
+.history-empty {
+    padding: 10px 4px;
+    font-size: 13px;
+    color: var(--neutral-tertiary);
+}
+
+.history-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 7px 8px;
+    border-bottom: 1px solid var(--neutral-lighter);
+    cursor: pointer;
+    font-size: 13px;
+}
+
+.history-item:hover,
+.history-item:focus {
+    background: var(--theme-lighter);
+    outline: none;
+}
+
+.history-badge {
+    flex-shrink: 0;
+    min-width: 62px;
+    text-align: center;
+    padding: 2px 8px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.history-badge.success {
+    background: var(--success-bg);
+    color: var(--success);
+}
+
+.history-badge.error {
+    background: var(--error-bg);
+    color: var(--error);
+}
+
+.history-badge.running {
+    background: var(--theme-light);
+    color: var(--theme-dark);
+}
+
+.history-label {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.history-meta {
+    flex-shrink: 0;
+    font-size: 12px;
+    color: var(--neutral-secondary);
+}
+
+/* ---------- misc -------------------------------------------------------- */
 
 .spinner {
     display: inline-block;
@@ -263,20 +723,41 @@ main {
     to { transform: rotate(360deg); }
 }
 
-@media (max-width: 768px) {
-    header h1 {
-        font-size: 1.8em;
-    }
-
-    .command-nav {
+@media (max-width: 900px) {
+    .layout {
         grid-template-columns: 1fr;
     }
 
-    main {
-        padding: 20px;
+    .command-nav {
+        position: static;
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+
+    .nav-header {
+        display: none;
     }
 
     .nav-btn {
-        padding: 12px;
+        width: auto;
+        flex: 1 1 190px;
+        border-left: none;
+        border-bottom: 3px solid transparent;
+    }
+
+    .nav-btn.active {
+        border-left-color: transparent;
+        border-bottom-color: var(--theme-primary);
+    }
+}
+
+@media (max-width: 768px) {
+    main {
+        padding: 16px;
+    }
+
+    .topbar-module,
+    .topbar-divider {
+        display: none;
     }
 }

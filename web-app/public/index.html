@@ -7,36 +7,74 @@
     <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>D365 Finance & Operations Admin Tools</h1>
-            <p class="subtitle">Web UI for common management tasks</p>
-        </header>
+    <div class="topbar">
+        <button class="topbar-nav-btn" type="button" aria-label="Navigation">&#xE700;</button>
+        <span class="topbar-app">Finance and operations</span>
+        <span class="topbar-divider"></span>
+        <span class="topbar-module">Administration tools</span>
+        <span class="topbar-spacer"></span>
+        <span class="topbar-env" id="topbar-env"></span>
+    </div>
 
+    <div class="container">
+        <div id="elevation-warning" class="message-bar message-bar-warning hidden">
+            <span class="message-bar-icon">&#xE7BA;</span>
+            <span class="message-bar-text">
+                <strong>Not running as Administrator.</strong>
+                Starting and stopping services will fail. Stop the server and run
+                <code>npm start</code> again from a PowerShell window opened with
+                &ldquo;Run as Administrator&rdquo;.
+            </span>
+        </div>
+
+        <div class="layout">
         <nav class="command-nav">
+            <div class="nav-header">Common tasks</div>
             <button class="nav-btn active" data-command="Get-D365Environment">
-                <span class="icon">📊</span>
+                <span class="icon">&#xE95E;</span>
                 Environment Health
             </button>
-            <button class="nav-btn" data-command="Restart-D365Environment">
-                <span class="icon">🔄</span>
-                Restart Services
+            <button class="nav-btn" data-command="Start-D365Environment">
+                <span class="icon">&#xE768;</span>
+                Start Services
+            </button>
+            <button class="nav-btn" data-command="Stop-D365Environment">
+                <span class="icon">&#xE71A;</span>
+                Stop Services
             </button>
             <button class="nav-btn" data-command="New-D365Bacpac">
-                <span class="icon">💾</span>
+                <span class="icon">&#xE74E;</span>
                 Backup Database
             </button>
             <button class="nav-btn" data-command="Import-D365Bacpac">
-                <span class="icon">📥</span>
+                <span class="icon">&#xE896;</span>
                 Restore Database
             </button>
             <button class="nav-btn" data-command="Invoke-D365DBSync">
-                <span class="icon">🔗</span>
+                <span class="icon">&#xE895;</span>
                 Sync Database
             </button>
+
+            <div class="nav-header nav-header-spaced">
+                All commands
+                <span class="nav-count" id="catalog-count"></span>
+            </div>
+
+            <div class="nav-search">
+                <span class="nav-search-icon">&#xE721;</span>
+                <input type="search" id="catalog-search" placeholder="Search commands" autocomplete="off">
+            </div>
+
+            <div class="catalog-list" id="catalog-list">
+                <div class="catalog-status">Loading command catalog…</div>
+            </div>
         </nav>
 
+        <div class="content">
         <main>
+            <!-- Built at runtime from the module's own parameter metadata -->
+            <div class="command-form hidden" id="form-generated"></div>
+
             <!-- Get-D365Environment Command -->
             <div class="command-form" id="form-Get-D365Environment">
                 <h2>Check Environment Health</h2>
@@ -44,50 +82,111 @@
 
                 <form onsubmit="executeCommand(event, 'Get-D365Environment')">
                     <div class="form-group">
-                        <label for="env-ComputerName">Computer Name (optional)</label>
-                        <input type="text" id="env-ComputerName" name="ComputerName" placeholder="Leave empty for local machine">
-                        <small>The name of the computer to query</small>
+                        <label for="env-Target">Services to Query</label>
+                        <select id="env-Target" onchange="toggleServiceTarget('env')">
+                            <option value="all">All Services</option>
+                            <option value="specific">Specific Services</option>
+                        </select>
+                    </div>
+
+                    <input type="checkbox" id="env-All" name="All" checked style="display:none;">
+
+                    <div class="form-group service-checkboxes" id="env-specific-services" style="display:none;">
+                        <label><input type="checkbox" name="Aos" disabled> AOS (Application Object Server)</label>
+                        <label><input type="checkbox" name="Batch" disabled> Batch Server</label>
+                        <label><input type="checkbox" name="FinancialReporter" disabled> Management Reporter</label>
+                        <label><input type="checkbox" name="DMF" disabled> Data Management Framework</label>
                     </div>
 
                     <div class="form-group">
-                        <label for="env-ShowDetails">Show Detailed Info</label>
-                        <input type="checkbox" id="env-ShowDetails" name="Detailed">
-                        <small>Display additional information about each service</small>
+                        <label for="env-OnlyStartTypeAutomatic">Only Automatic-Startup Services</label>
+                        <input type="checkbox" id="env-OnlyStartTypeAutomatic" name="OnlyStartTypeAutomatic">
+                        <small>Filter out services set to Manual or Disabled</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="env-OutputServiceDetailsOnly">Hide Server Name</label>
+                        <input type="checkbox" id="env-OutputServiceDetailsOnly" name="OutputServiceDetailsOnly">
+                        <small>Omit the server name column from the output</small>
                     </div>
 
                     <button type="submit" class="btn-primary">Check Environment Status</button>
                 </form>
             </div>
 
-            <!-- Restart-D365Environment Command -->
-            <div class="command-form hidden" id="form-Restart-D365Environment">
-                <h2>Restart Services</h2>
-                <p class="description">Restart D365 services. Useful for clearing caches or after deployments</p>
+            <!-- Start-D365Environment Command -->
+            <div class="command-form hidden" id="form-Start-D365Environment">
+                <h2>Start Services</h2>
+                <p class="description">Start D365 services on the environment</p>
 
-                <form onsubmit="executeCommand(event, 'Restart-D365Environment')">
+                <form onsubmit="executeCommand(event, 'Start-D365Environment')">
                     <div class="form-group">
-                        <label for="restart-ComputerName">Computer Name (optional)</label>
-                        <input type="text" id="restart-ComputerName" name="ComputerName" placeholder="Leave empty for local machine">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="restart-ServiceType">Service to Restart</label>
-                        <select id="restart-ServiceType" name="ServiceType">
-                            <option value="">All Services</option>
-                            <option value="AOS">AOS (Application Object Server)</option>
-                            <option value="Batch">Batch Server</option>
-                            <option value="MR">Management Reporter</option>
-                            <option value="DMF">Data Management Framework</option>
+                        <label for="start-Target">Services to Start</label>
+                        <select id="start-Target" onchange="toggleServiceTarget('start')">
+                            <option value="all">All Services</option>
+                            <option value="specific">Specific Services</option>
                         </select>
                     </div>
 
-                    <div class="form-group">
-                        <label for="restart-Wait">Wait for Restart to Complete</label>
-                        <input type="checkbox" id="restart-Wait" name="Wait" checked>
-                        <small>Wait until all services are running again</small>
+                    <input type="checkbox" id="start-All" name="All" checked style="display:none;">
+
+                    <div class="form-group service-checkboxes" id="start-specific-services" style="display:none;">
+                        <label><input type="checkbox" name="Aos" disabled> AOS (Application Object Server)</label>
+                        <label><input type="checkbox" name="Batch" disabled> Batch Server</label>
+                        <label><input type="checkbox" name="FinancialReporter" disabled> Management Reporter</label>
+                        <label><input type="checkbox" name="DMF" disabled> Data Management Framework</label>
                     </div>
 
-                    <button type="submit" class="btn-primary">Restart Services</button>
+                    <div class="form-group">
+                        <label for="start-OnlyStartTypeAutomatic">Only Automatic-Startup Services</label>
+                        <input type="checkbox" id="start-OnlyStartTypeAutomatic" name="OnlyStartTypeAutomatic">
+                        <small>Only start services that are configured with an Automatic startup type</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="start-ShowOriginalProgress">Show Detailed Output</label>
+                        <input type="checkbox" id="start-ShowOriginalProgress" name="ShowOriginalProgress">
+                    </div>
+
+                    <button type="submit" class="btn-primary">Start Services</button>
+                </form>
+            </div>
+
+            <!-- Stop-D365Environment Command -->
+            <div class="command-form hidden" id="form-Stop-D365Environment">
+                <h2>Stop Services</h2>
+                <p class="description">Stop D365 services on the environment</p>
+
+                <form onsubmit="executeCommand(event, 'Stop-D365Environment')">
+                    <div class="form-group">
+                        <label for="stop-Target">Services to Stop</label>
+                        <select id="stop-Target" onchange="toggleServiceTarget('stop')">
+                            <option value="all">All Services</option>
+                            <option value="specific">Specific Services</option>
+                        </select>
+                    </div>
+
+                    <input type="checkbox" id="stop-All" name="All" checked style="display:none;">
+
+                    <div class="form-group service-checkboxes" id="stop-specific-services" style="display:none;">
+                        <label><input type="checkbox" name="Aos" disabled> AOS (Application Object Server)</label>
+                        <label><input type="checkbox" name="Batch" disabled> Batch Server</label>
+                        <label><input type="checkbox" name="FinancialReporter" disabled> Management Reporter</label>
+                        <label><input type="checkbox" name="DMF" disabled> Data Management Framework</label>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="stop-Kill">Force Kill</label>
+                        <input type="checkbox" id="stop-Kill" name="Kill">
+                        <small>Forcefully terminate the service instead of a graceful stop</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="stop-ShowOriginalProgress">Show Detailed Output</label>
+                        <input type="checkbox" id="stop-ShowOriginalProgress" name="ShowOriginalProgress">
+                    </div>
+
+                    <button type="submit" class="btn-primary">Stop Services</button>
                 </form>
             </div>
 
@@ -98,20 +197,56 @@
 
                 <form onsubmit="executeCommand(event, 'New-D365Bacpac')">
                     <div class="form-group">
-                        <label for="backup-OutputPath">Output Directory *</label>
-                        <input type="text" id="backup-OutputPath" name="OutputPath" required placeholder="e.g., C:\\Backups">
-                        <small>Where to save the BACPAC file</small>
+                        <label for="backup-Mode">Environment Tier *</label>
+                        <select id="backup-Mode" data-switch-select onchange="toggleTier1Fields()">
+                            <option value="ExportModeTier2">Tier 2+ (Azure SQL / sandbox)</option>
+                            <option value="ExportModeTier1">Tier 1 (SQL Server / onebox)</option>
+                        </select>
+                        <small>Tier 1 takes a local SQL backup first; Tier 2+ works against Azure SQL</small>
                     </div>
 
                     <div class="form-group">
-                        <label for="backup-SourceComputerName">Source Computer (optional)</label>
-                        <input type="text" id="backup-SourceComputerName" name="SourceComputerName" placeholder="Leave empty for local machine">
+                        <label for="backup-BacpacFile">BACPAC Output File *</label>
+                        <input type="text" id="backup-BacpacFile" name="BacpacFile" required placeholder="e.g., C:\Backups\AxDB.bacpac">
+                        <small>Full path including the .bacpac file name</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="backup-DatabaseServer">Database Server (optional)</label>
+                        <input type="text" id="backup-DatabaseServer" name="DatabaseServer" placeholder="Defaults to configured server">
                     </div>
 
                     <div class="form-group">
                         <label for="backup-DatabaseName">Database Name (optional)</label>
                         <input type="text" id="backup-DatabaseName" name="DatabaseName" placeholder="Defaults to AxDB">
                         <small>Usually AxDB or AxDB_suffix</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="backup-SqlUser">SQL User (optional)</label>
+                        <input type="text" id="backup-SqlUser" name="SqlUser" placeholder="Defaults to configured user">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="backup-SqlPwd">SQL Password (optional)</label>
+                        <input type="password" id="backup-SqlPwd" name="SqlPwd" placeholder="Defaults to configured password">
+                    </div>
+
+                    <div class="form-group tier1-only" id="backup-tier1-only" style="display:none;">
+                        <label for="backup-BackupDirectory">Backup Directory (Tier 1 only)</label>
+                        <input type="text" id="backup-BackupDirectory" name="BackupDirectory" disabled placeholder="C:\Temp\d365fo.tools\SqlBackups">
+                        <small>Staging location for the intermediate SQL backup</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="backup-ExportOnly">Export Only</label>
+                        <input type="checkbox" id="backup-ExportOnly" name="ExportOnly">
+                        <small>Export the existing database without creating a temporary copy first</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="backup-ShowOriginalProgress">Show Detailed Output</label>
+                        <input type="checkbox" id="backup-ShowOriginalProgress" name="ShowOriginalProgress">
                     </div>
 
                     <button type="submit" class="btn-primary">Create Backup</button>
@@ -125,25 +260,80 @@
 
                 <form onsubmit="executeCommand(event, 'Import-D365Bacpac')">
                     <div class="form-group">
+                        <label for="restore-Mode">Environment Tier *</label>
+                        <select id="restore-Mode" data-switch-select onchange="toggleTier2Fields()">
+                            <option value="ImportModeTier1">Tier 1 (SQL Server / onebox)</option>
+                            <option value="ImportModeTier2">Tier 2+ (Azure SQL / sandbox)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
                         <label for="restore-BacpacFile">BACPAC File Path *</label>
-                        <input type="text" id="restore-BacpacFile" name="BacpacFile" required placeholder="e.g., C:\\Backups\\backup.bacpac">
+                        <input type="text" id="restore-BacpacFile" name="BacpacFile" required placeholder="e.g., C:\Backups\backup.bacpac">
                         <small>Full path to the BACPAC file</small>
                     </div>
 
                     <div class="form-group">
-                        <label for="restore-TargetComputerName">Target Computer (optional)</label>
-                        <input type="text" id="restore-TargetComputerName" name="TargetComputerName" placeholder="Leave empty for local machine">
+                        <label for="restore-NewDatabaseName">New Database Name *</label>
+                        <input type="text" id="restore-NewDatabaseName" name="NewDatabaseName" required placeholder="e.g., AxDB_imported">
+                        <small>The database to create from the BACPAC</small>
                     </div>
 
                     <div class="form-group">
-                        <label for="restore-NewDatabaseName">New Database Name (optional)</label>
-                        <input type="text" id="restore-NewDatabaseName" name="NewDatabaseName" placeholder="Defaults to AxDB">
+                        <label for="restore-DatabaseServer">Database Server (optional)</label>
+                        <input type="text" id="restore-DatabaseServer" name="DatabaseServer" placeholder="Defaults to configured server">
                     </div>
 
                     <div class="form-group">
-                        <label for="restore-DiagnosticFile">Enable Diagnostics</label>
-                        <input type="checkbox" id="restore-DiagnosticFile" name="DiagnosticFile">
-                        <small>Save diagnostic output (helpful for troubleshooting)</small>
+                        <label for="restore-SqlUser">SQL User (optional)</label>
+                        <input type="text" id="restore-SqlUser" name="SqlUser" placeholder="Defaults to configured user">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="restore-SqlPwd">SQL Password (optional)</label>
+                        <input type="password" id="restore-SqlPwd" name="SqlPwd" placeholder="Defaults to configured password">
+                    </div>
+
+                    <div id="restore-tier2-fields" style="display:none;">
+                        <div class="form-group">
+                            <label for="restore-AxDeployExtUserPwd">axdeployextuser Password *</label>
+                            <input type="password" id="restore-AxDeployExtUserPwd" name="AxDeployExtUserPwd" disabled>
+                        </div>
+                        <div class="form-group">
+                            <label for="restore-AxDbAdminPwd">axdbadmin Password *</label>
+                            <input type="password" id="restore-AxDbAdminPwd" name="AxDbAdminPwd" disabled>
+                        </div>
+                        <div class="form-group">
+                            <label for="restore-AxRuntimeUserPwd">axruntimeuser Password *</label>
+                            <input type="password" id="restore-AxRuntimeUserPwd" name="AxRuntimeUserPwd" disabled>
+                        </div>
+                        <div class="form-group">
+                            <label for="restore-AxMrRuntimeUserPwd">axmrruntimeuser Password *</label>
+                            <input type="password" id="restore-AxMrRuntimeUserPwd" name="AxMrRuntimeUserPwd" disabled>
+                        </div>
+                        <div class="form-group">
+                            <label for="restore-AxRetailRuntimeUserPwd">axretailruntimeuser Password *</label>
+                            <input type="password" id="restore-AxRetailRuntimeUserPwd" name="AxRetailRuntimeUserPwd" disabled>
+                        </div>
+                        <div class="form-group">
+                            <label for="restore-AxRetailDataSyncUserPwd">axretaildatasyncuser Password *</label>
+                            <input type="password" id="restore-AxRetailDataSyncUserPwd" name="AxRetailDataSyncUserPwd" disabled>
+                        </div>
+                        <div class="form-group">
+                            <label for="restore-AxDbReadonlyUserPwd">axdbreadonlyuser Password</label>
+                            <input type="password" id="restore-AxDbReadonlyUserPwd" name="AxDbReadonlyUserPwd" disabled>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="restore-DiagnosticFile">Diagnostic File Path (optional)</label>
+                        <input type="text" id="restore-DiagnosticFile" name="DiagnosticFile" placeholder="e.g., C:\Temp\import-diag.xml">
+                        <small>Where to write diagnostic output (helpful for troubleshooting)</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="restore-ShowOriginalProgress">Show Detailed Output</label>
+                        <input type="checkbox" id="restore-ShowOriginalProgress" name="ShowOriginalProgress">
                     </div>
 
                     <button type="submit" class="btn-primary">Import BACPAC</button>
@@ -157,15 +347,40 @@
 
                 <form onsubmit="executeCommand(event, 'Invoke-D365DBSync')">
                     <div class="form-group">
-                        <label for="sync-Timeout">Timeout (seconds) (optional)</label>
-                        <input type="number" id="sync-Timeout" name="Timeout" placeholder="600" min="60">
-                        <small>Maximum time to wait for sync to complete</small>
+                        <label for="sync-SyncMode">Sync Mode</label>
+                        <select id="sync-SyncMode" name="SyncMode">
+                            <option value="FullAll">FullAll (default)</option>
+                            <option value="PartialList">PartialList</option>
+                            <option value="InitialSchema">InitialSchema</option>
+                            <option value="FullTablesAndViews">FullTablesAndViews</option>
+                            <option value="FullSecurity">FullSecurity</option>
+                            <option value="PartialSecurity">PartialSecurity</option>
+                            <option value="CleanSecurity">CleanSecurity</option>
+                            <option value="Bootstrap">Bootstrap</option>
+                            <option value="Diag">Diag</option>
+                        </select>
                     </div>
 
                     <div class="form-group">
-                        <label for="sync-ShowProgress">Show Progress</label>
-                        <input type="checkbox" id="sync-ShowProgress" name="ShowProgress" checked>
-                        <small>Display real-time progress updates</small>
+                        <label for="sync-Verbosity">Verbosity</label>
+                        <select id="sync-Verbosity" name="Verbosity">
+                            <option value="Normal">Normal (default)</option>
+                            <option value="Quiet">Quiet</option>
+                            <option value="Minimal">Minimal</option>
+                            <option value="Detailed">Detailed</option>
+                            <option value="Diagnostic">Diagnostic</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="sync-LogPath">Log Path (optional)</label>
+                        <input type="text" id="sync-LogPath" name="LogPath" placeholder="Defaults to the module's temp log folder">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="sync-ShowOriginalProgress">Show Detailed Output</label>
+                        <input type="checkbox" id="sync-ShowOriginalProgress" name="ShowOriginalProgress" checked>
+                        <small>Stream the sync tool's own progress into the output</small>
                     </div>
 
                     <button type="submit" class="btn-primary">Start Sync</button>
@@ -174,16 +389,32 @@
         </main>
 
         <!-- Output Section -->
-        <section class="output-section">
-            <h3>Output</h3>
-            <div class="output-header">
-                <span id="command-name">Ready</span>
-                <span id="execution-time"></span>
-                <button class="btn-small" id="copy-btn" onclick="copyOutput()" style="display:none;">Copy</button>
-                <button class="btn-small" id="clear-btn" onclick="clearOutput()">Clear</button>
+        <section class="output-section fasttab">
+            <div class="fasttab-header">
+                <span class="fasttab-chevron">&#xE70D;</span>
+                <span class="fasttab-title">Output</span>
+                <span class="fasttab-summary">
+                    <span id="command-name">Ready</span>
+                    <span id="execution-time"></span>
+                </span>
+                <span class="fasttab-actions">
+                    <button class="btn-small" id="copy-btn" onclick="copyOutput()" style="display:none;">Copy</button>
+                    <button class="btn-small" id="clear-btn" onclick="clearOutput()">Clear</button>
+                </span>
             </div>
-            <pre id="output" class="output-box">Waiting for command execution...</pre>
+            <div class="fasttab-body">
+                <pre id="output" class="output-box">Waiting for command execution...</pre>
+
+                <div class="history">
+                    <h4>Recent runs</h4>
+                    <ul id="history-list">
+                        <li class="history-empty">Loading…</li>
+                    </ul>
+                </div>
+            </div>
         </section>
+        </div><!-- /.content -->
+        </div><!-- /.layout -->
     </div>
 
     <script src="/app.js"></script>
